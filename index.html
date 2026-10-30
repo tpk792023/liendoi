@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Góc Tổng Phụ trách Đội</title>
+<meta name="description" content="Lịch sinh hoạt hàng tuần, thông báo, ảnh truyền thống và tài liệu của Liên đội.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23E8A600'/%3E%3Cpath fill='%23C3161C' d='M12 4l2.2 5.2 5.6.4-4.3 3.7 1.4 5.5L12 15.9l-4.9 2.9 1.4-5.5-4.3-3.7 5.6-.4z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="band">
+  <div class="scarf" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="badge" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path fill="#C3161C" d="M12 2.2l2.6 6.2 6.7.5-5.1 4.4 1.6 6.5L12 16.3 6.2 19.8l1.6-6.5L2.7 8.9l6.7-.5z"/></svg>
+    </div>
+    <div class="band-text">
+      <div class="eyebrow" id="hdr-unit">Liên đội</div>
+      <h1>Góc Tổng Phụ trách Đội</h1>
+      <div class="sub" id="hdr-sub">Sinh hoạt hàng tuần · Thông báo · Ảnh truyền thống · Tài liệu</div>
+    </div>
+    <button class="btn small edit-info" id="btn-info" type="button" hidden>Sửa thông tin</button>
+  </div>
+</header>
+
+<nav class="nav" aria-label="Các mục">
+  <div class="wrap">
+    <a href="#trang-chu" data-view="trang-chu">Trang chủ</a>
+    <a href="#sinh-hoat" data-view="sinh-hoat">Sinh hoạt hàng tuần</a>
+    <a href="#thong-bao" data-view="thong-bao">Thông báo</a>
+    <a href="#anh" data-view="anh">Ảnh truyền thống</a>
+    <a href="#tai-lieu" data-view="tai-lieu">Tài liệu</a>
+  </div>
+</nav>
+
+<main>
+  <div class="wrap">
+    <div id="global-notice" class="notice" hidden></div>
+
+    <section class="view" id="v-trang-chu" data-v="trang-chu">
+      <div class="home-grid">
+        <div>
+          <div class="section-label"><span>Sinh hoạt tuần này</span><a href="#sinh-hoat" data-view="sinh-hoat">Xem tất cả tuần</a></div>
+          <div id="home-week"></div>
+        </div>
+        <div>
+          <div class="section-label"><span>Thông báo mới</span><a href="#thong-bao" data-view="thong-bao">Tất cả thông báo</a></div>
+          <div class="card" id="home-ann"></div>
+        </div>
+      </div>
+      <div>
+        <div class="section-label"><span>Ảnh truyền thống mới thêm</span><a href="#anh" data-view="anh">Mở kho ảnh</a></div>
+        <div id="home-photos"></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-sinh-hoat" data-v="sinh-hoat" hidden>
+      <div class="view-head">
+        <div><h2>Sinh hoạt hàng tuần</h2><p>Chủ điểm, lớp trực tuần và nội dung sinh hoạt dưới cờ, sinh hoạt Đội từng tuần.</p></div>
+        <button class="btn primary" id="add-week" type="button" hidden>+ Thêm tuần</button>
+      </div>
+      <div id="weeks" class="view"></div>
+    </section>
+
+    <section class="view" id="v-thong-bao" data-v="thong-bao" hidden>
+      <div class="view-head">
+        <div><h2>Thông báo</h2><p>Lịch hoạt động, nhắc việc cho các chi đội và Ban chỉ huy Liên đội.</p></div>
+        <button class="btn primary" id="add-ann" type="button" hidden>+ Đăng thông báo</button>
+      </div>
+      <div id="anns" class="view"></div>
+    </section>
+
+    <section class="view" id="v-anh" data-v="anh" hidden>
+      <div class="view-head">
+        <div><h2>Ảnh truyền thống</h2><p>Lưu giữ hình ảnh các phong trào, ngày lễ, hội thi của Liên đội qua từng năm học.</p></div>
+        <button class="btn primary" id="add-photo" type="button" hidden>+ Tải ảnh lên</button>
+      </div>
+      <div class="filters" id="photo-filters"></div>
+      <div id="albums" class="view"></div>
+    </section>
+
+    <section class="view" id="v-tai-lieu" data-v="tai-lieu" hidden>
+      <div class="view-head">
+        <div><h2>Tài liệu</h2><p>Kế hoạch, văn bản hướng dẫn, biểu mẫu và tài liệu sinh hoạt Đội.</p></div>
+        <button class="btn primary" id="add-doc" type="button" hidden>+ Thêm tài liệu</button>
+      </div>
+      <div class="doc-tools">
+        <input id="doc-q" type="search" placeholder="Tìm theo tên tài liệu…" aria-label="Tìm tài liệu">
+        <select id="doc-cat" aria-label="Lọc theo nhóm"></select>
+      </div>
+      <div id="docs"></div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="motto">Vì Tổ quốc xã hội chủ nghĩa, vì lý tưởng của Bác Hồ vĩ đại: Sẵn sàng!</span>
+    <span class="auth"><span id="ftr-who"></span><button class="link-btn" id="btn-auth" type="button">Đăng nhập quản trị</button></span>
+  </div>
+</footer>
+
+<dialog id="dlg"><form id="dlg-form" method="dialog" novalidate></form></dialog>
+<div class="lightbox" id="lb" hidden role="dialog" aria-modal="true" aria-label="Xem ảnh">
+  <div class="lb-stage"><img id="lb-img" alt=""></div>
+  <div class="lb-bar">
+    <div class="cap" id="lb-cap"></div>
+    <button class="btn small" id="lb-prev" type="button">‹ Trước</button>
+    <button class="btn small" id="lb-next" type="button">Sau ›</button>
+    <button class="btn small" id="lb-del" type="button" hidden>Xóa ảnh</button>
+    <button class="btn small" id="lb-close" type="button">Đóng</button>
+  </div>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
