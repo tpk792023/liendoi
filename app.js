@@ -75,9 +75,11 @@ function render() {
 
   const hint = S.canEdit ? " Bấm nút phía trên để thêm." : "";
   const loading = configured && !S.loaded;
+  const canSeed = S.canEdit && S.loaded && !S.weeks.length && !S.anns.length;
+  const seedBtn = canSeed ? `<div style="margin-top:12px"><button class="btn primary" type="button" data-seed="1">Thêm nội dung khởi đầu</button></div>` : "";
 
   const cw = currentWeek() || S.weeks[0];
-  $("#home-week").innerHTML = cw ? weekHTML(cw, cw === currentWeek()) : emptyHTML(loading ? "Đang tải…" : "Chưa có lịch sinh hoạt", loading ? "" : "Lịch sinh hoạt của tuần sẽ hiện ở đây.");
+  $("#home-week").innerHTML = cw ? weekHTML(cw, cw === currentWeek()) : emptyHTML(loading ? "Đang tải…" : "Chưa có lịch sinh hoạt", loading ? "" : "Lịch sinh hoạt của tuần sẽ hiện ở đây.").replace(/<\/div>$/, seedBtn + "</div>");
   const top = sortedAnns().slice(0, 4);
   $("#home-ann").innerHTML = top.length ? top.map((a) => `<div class="ann-mini"><div class="ann-head"><span class="t">${esc(a.title)}</span>${annTags(a)}</div><span class="muted" style="font-size:13px">${fmt(a.date)}</span></div>`).join("") : `<span class="muted">${loading ? "Đang tải…" : "Chưa có thông báo nào."}</span>`;
   const recent = S.photos.slice(0, 6);
@@ -282,6 +284,34 @@ $("#btn-auth").onclick = async () => {
   } catch (err) { console.error(err); notice("Chưa đăng nhập được: " + (err.code || err.message) + ". Kiểm tra tên miền đã được thêm vào Firebase Authentication chưa."); }
 };
 
+/* ---------- Nội dung khởi đầu (chỉ hiện nút khi trang còn trống) ---------- */
+async function seedSample() {
+  const info = await getDoc(doc(db, "site", "info"));
+  if (!info.exists()) await setDoc(doc(db, "site", "info"), { school: "Trường TH-THCS Đa Phước", unit: "Liên đội TH-THCS Đa Phước", leader: "", year: "2026–2027", contact: "" });
+  const weeks = [
+    { week: 8, from: "2026-10-26", to: "2026-10-31", theme: "Mừng ngày Phụ nữ Việt Nam 20/10 – tổng kết tháng 10", duty: "8A1", host: "Chi đội 8A1",
+      content: "Chào cờ, nhận xét thi đua tuần 7\nTổng kết phong trào \"Kế hoạch nhỏ\" đợt 1\nPhổ biến chủ điểm tháng 11: Tôn sư trọng đạo" },
+    { week: 9, from: "2026-11-02", to: "2026-11-07", theme: "Tôn sư trọng đạo", duty: "7A3", host: "Chi đội 7A3",
+      content: "Chào cờ, nhận xét thi đua tuần 8\nPhát động thi đua \"Hoa điểm tốt\" chào mừng 20/11\nCác chi đội đăng ký tiết mục văn nghệ" },
+    { week: 10, from: "2026-11-09", to: "2026-11-14", theme: "Tôn sư trọng đạo – Ngày Pháp luật Việt Nam 9/11", duty: "6A1", host: "Chi đội 6A1",
+      content: "Chào cờ, nhận xét thi đua tuần 9\nTuyên truyền Ngày Pháp luật Việt Nam 9/11\nCác chi đội làm báo tường chào mừng 20/11, nộp trước thứ Sáu 13/11\nTập luyện văn nghệ chào mừng 20/11" },
+    { week: 11, from: "2026-11-16", to: "2026-11-21", theme: "Mừng ngày Nhà giáo Việt Nam 20/11", duty: "9A1", host: "Chi đội 9A1",
+      content: "Chào cờ, nhận xét thi đua tuần 10\nChấm và trao giải báo tường\nChương trình văn nghệ chào mừng 20/11\nHọc sinh tri ân thầy cô giáo" },
+    { week: 12, from: "2026-11-23", to: "2026-11-28", theme: "Tổng kết tháng 11 – hướng về tháng 12", duty: "8A2", host: "Chi đội 8A2",
+      content: "Chào cờ, nhận xét thi đua tuần 11\nTổng kết đợt thi đua \"Hoa điểm tốt\", khen thưởng chi đội xuất sắc\nPhổ biến chủ điểm tháng 12: Uống nước nhớ nguồn (22/12 – Ngày thành lập Quân đội nhân dân Việt Nam)" },
+  ];
+  for (const w of weeks) await addDoc(collection(db, "weekly"), { ...w, note: "", updatedAt: Date.now() });
+  const anns = [
+    { title: "Đăng ký tiết mục văn nghệ chào mừng 20/11", date: "2026-10-30", pinned: true, urgent: false,
+      body: "Các chi đội nộp danh sách tiết mục cho Ban chỉ huy Liên đội trước thứ Sáu, 06/11/2026.\nMỗi chi đội tối thiểu 1 tiết mục." },
+    { title: "Họp Ban chỉ huy Liên đội", date: "2026-10-29", pinned: false, urgent: true,
+      body: "16h30 thứ Hai, 02/11/2026 tại phòng Đội. Chi đội trưởng các lớp tham dự đầy đủ." },
+    { title: "Thi làm báo tường chào mừng 20/11", date: "2026-10-30", pinned: false, urgent: false,
+      body: "Mỗi chi đội làm 1 tờ báo tường khổ A0 với chủ đề \"Tôn sư trọng đạo\".\nNộp về phòng Đội trước thứ Sáu, 13/11/2026. Kết quả công bố trong tuần 11." },
+  ];
+  for (const a of anns) await addDoc(collection(db, "announcements"), { ...a, createdAt: Date.now() });
+}
+
 /* ---------- Xóa (bấm hai lần) ---------- */
 async function removePath(path) {
   const [col, id] = path.split("/");
@@ -297,6 +327,7 @@ function armOrRun(btn, run) {
 document.addEventListener("click", (e) => {
   const t = e.target.closest("button");
   if (!t) return;
+  if (t.dataset.seed) { t.disabled = true; t.textContent = "Đang thêm…"; return seedSample().catch((err) => { console.error(err); notice(errText(err)); t.disabled = false; t.textContent = "Thêm nội dung khởi đầu"; }); }
   if (t.dataset.del) return armOrRun(t, () => removePath(t.dataset.del));
   if (t.dataset.editWeek) return editWeek(S.weeks.find((w) => w.id === t.dataset.editWeek));
   if (t.dataset.editAnn) return editAnn(S.anns.find((a) => a.id === t.dataset.editAnn));
